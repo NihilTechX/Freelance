@@ -60,11 +60,11 @@ services:
       - key: JWT_SECRET_KEY
         sync: false
 
-  # ── PostgreSQL Database ───────────────────────────────────
-  - type: pserv
-    name: elitematch-db
-    env: postgresql
-    region: singapore
-    plan: free
+# ── PostgreSQL Database ───────────────────────────────────
+databases:
+  - name: elitematch-db
     databaseName: freelance_db
-    databaseUser: freelance_user
+    user: freelance_user
+    plan: free
+    region: singapore
+
