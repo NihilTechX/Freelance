@@ -1,352 +1,289 @@
-# Freelance Platform
+# EliteMatch — Professional Freelance Marketplace
 
-A full-stack freelance marketplace platform that connects freelancers with job opportunities using intelligent matching algorithms.
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-Active-brightgreen?style=flat-square" />
+  <img src="https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square&logo=fastapi" />
+  <img src="https://img.shields.io/badge/Frontend-React%20%2B%20Vite-61DAFB?style=flat-square&logo=react" />
+  <img src="https://img.shields.io/badge/Database-PostgreSQL-4169E1?style=flat-square&logo=postgresql" />
+  <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" />
+</p>
 
-## Features
+> **EliteMatch** is a full-stack freelance marketplace platform that intelligently connects businesses with world-class freelancers. Post projects, receive proposals, hire talent, manage contracts, and release payments — all in one place.
 
-- **User Authentication & Profiles**: Secure JWT-based authentication with detailed user profiles and skill management
-- **Job Management**: Post, search, and manage freelance jobs with detailed descriptions and requirements
-- **Intelligent Matching**: ML-powered matching engine that recommends suitable freelancers for jobs based on skills and experience
-- **Proposals & Contracts**: Freelancers can submit proposals, and clients can accept/reject them with contract management
-- **Reviews & Ratings**: Comprehensive review system for both freelancers and clients
-- **Notifications**: Real-time notifications for proposals, reviews, and contract updates
-- **Asynchronous Tasks**: Celery-based background job processing for matching and notifications
+---
 
-## Tech Stack
+## ✨ Key Features
 
-### Backend
-- **Framework**: FastAPI with Uvicorn ASGI server
-- **Database**: PostgreSQL with SQLAlchemy ORM
-- **Async Support**: asyncpg for async database operations
-- **Authentication**: JWT tokens with Python-Jose
-- **Task Queue**: Celery with Redis broker
-- **Matching Engine**: Scikit-learn for ML-based job-freelancer matching
-- **Migrations**: Alembic for database schema management
+### For Clients
+- 📋 **Post Projects** — Describe your requirements, set a budget, and tag required skills
+- 📬 **Receive Proposals** — Freelancers apply with custom cover letters and hourly rates
+- 🤝 **Hire & Contract** — Accept the best proposal and instantly create a secure contract
+- ✅ **Complete & Review** — Mark projects done and leave verified ratings for freelancers
+- 📊 **Dashboard** — Track all active projects, proposals, and contracts at a glance
 
-### Frontend
-- **Library**: React 19 with Vite
-- **HTTP Client**: Axios
-- **UI Components**: Lucide React icons
-- **Charting**: Recharts for data visualization
-- **Styling**: CSS (customizable)
+### For Freelancers
+- 🔍 **Browse Projects** — Search open opportunities by keyword
+- ✍️ **Submit Proposals** — Send tailored proposals with your rate and cover letter
+- 📄 **Manage Contracts** — View all active and completed work agreements
+- 👤 **Professional Profile** — Showcase your title, bio, hourly rate, and skill set
 
-### Infrastructure
-- **Database**: PostgreSQL 15 (Docker)
-- **Cache/Broker**: Redis 7 (Docker)
-- **Containerization**: Docker & Docker Compose
+### Platform-wide
+- 🔒 **JWT Authentication** — Secure login with access + refresh token rotation
+- 🔔 **Live Notifications** — Real-time updates for proposals, contracts, and reviews
+- 🎯 **Smart Matching** — AI-powered TF-IDF cosine similarity ranks the best freelancers for each job
+- 🛡️ **Role-based Access Control** — Strict separation between client, freelancer, and admin capabilities
+- ⚡ **Background Jobs** — Async matching score computation with Redis-backed job queue
 
-## Project Structure
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| **Frontend** | React 18, Vite, Vanilla CSS |
+| **Backend API** | FastAPI (Python 3.11) |
+| **Database** | PostgreSQL + SQLAlchemy (async) |
+| **Migrations** | Alembic |
+| **Auth** | JWT (python-jose), bcrypt |
+| **Task Queue** | Celery + Redis |
+| **Matching Engine** | scikit-learn TF-IDF + Cosine Similarity |
+| **Hosting** | Vercel (frontend) + Render.com (backend) |
+
+---
+
+## 📁 Project Structure
 
 ```
-.
-├── app/
-│   ├── main.py                 # FastAPI application setup
-│   ├── config.py               # Configuration and settings
-│   ├── database.py             # Database connection setup
+elitematch/
+├── app/                        # FastAPI backend
+│   ├── core/                   # Auth, dependencies, Celery config
 │   ├── models/                 # SQLAlchemy ORM models
-│   │   ├── user.py            # User model with authentication
-│   │   ├── job.py             # Job posting model
-│   │   ├── profile.py         # Freelancer profiles and skills
-│   │   ├── proposal_contract.py# Proposals and contracts
-│   │   └── review_notification.py# Reviews and notifications
+│   ├── repositories/           # Database access layer (Repository pattern)
+│   ├── routers/                # API route handlers
 │   ├── schemas/                # Pydantic request/response schemas
-│   ├── routers/                # API endpoint routers
-│   │   ├── auth.py            # Authentication endpoints
-│   │   ├── jobs.py            # Job management endpoints
-│   │   ├── profiles.py        # Profile management endpoints
-│   │   ├── matching.py        # Job matching endpoints
-│   │   ├── proposals.py       # Proposal endpoints
-│   │   ├── contracts.py       # Contract management endpoints
-│   │   ├── reviews.py         # Review endpoints
-│   │   └── notifications.py   # Notification endpoints
 │   ├── services/               # Business logic layer
-│   ├── repositories/           # Data access layer
-│   ├── core/
-│   │   ├── security.py        # JWT and password utilities
-│   │   ├── dependencies.py    # FastAPI dependencies
-│   │   ├── exceptions.py      # Custom exception handlers
-│   │   └── celery_app.py      # Celery configuration
 │   └── tasks/                  # Celery background tasks
-├── alembic/                    # Database migrations
-├── frontend/                   # React SPA
+├── alembic/                    # Database migration scripts
+├── frontend/                   # React + Vite frontend
 │   ├── src/
-│   │   ├── App.jsx            # Main React component
-│   │   ├── api.js             # API client configuration
-│   │   ├── components/        # Reusable components
-│   │   └── pages/             # Page components
-│   ├── vite.config.js         # Vite configuration
-│   └── package.json           # Frontend dependencies
-├── scripts/
-│   └── seed.py                # Database seed script for testing
-├── docker-compose.yml          # Docker Compose configuration
-├── Dockerfile                  # Backend Docker image
-└── requirements.txt            # Python dependencies
+│   │   ├── App.jsx             # Main app with all pages & routing
+│   │   ├── api.js              # Axios client with auth interceptors
+│   │   └── index.css           # Premium design system (Caramel × Sand × Cream)
+│   ├── vercel.json             # Vercel deployment config
+│   └── vite.config.js          # Vite config with dev proxy
+├── render.yaml                 # Render.com deployment config
+├── requirements.txt            # Python dependencies
+└── .env.example                # Environment variable template
 ```
 
-## Getting Started
+---
+
+## 🚀 Local Development Setup
 
 ### Prerequisites
-- Docker & Docker Compose (recommended)
-- OR Python 3.9+, Node.js 18+, PostgreSQL 15, Redis 7
+- Python 3.11+
+- Node.js 18+
+- PostgreSQL 14+
+- Redis 7+
 
-### Option 1: Quick Start with Docker
+### 1. Clone & Install
 
 ```bash
-# Clone the repository
 git clone https://github.com/NihilTechX/Freelance.git
 cd Freelance
-
-# Start all services
-docker-compose up -d
-
-# Run database migrations
-docker exec freelance_backend alembic upgrade head
-
-# Seed database (optional)
-docker exec freelance_backend python scripts/seed.py
-
-# Backend: http://localhost:8000
-# Frontend: http://localhost:5173
-# API Docs: http://localhost:8000/docs
 ```
 
-### Option 2: Local Development Setup
+### 2. Backend Setup
 
-#### Backend Setup
 ```bash
 # Create virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+venv\Scripts\activate          # Windows
+# source venv/bin/activate     # Mac/Linux
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Create .env file
-cp .env.example .env
-# Edit .env with your database and Redis credentials
+# Configure environment
+copy .env.example .env         # Windows
+# cp .env.example .env         # Mac/Linux
+# Edit .env with your database credentials
+```
 
-# Start PostgreSQL and Redis
-docker-compose up db redis -d
+### 3. Database Setup
+
+```bash
+# Create the database
+createdb freelance_db
 
 # Run migrations
 alembic upgrade head
-
-# Start backend server
-uvicorn app.main:app --reload
-
-# Start Celery worker (in another terminal)
-celery -A app.core.celery_app worker --loglevel=info
 ```
 
-#### Frontend Setup
+### 4. Frontend Setup
+
 ```bash
-# Navigate to frontend directory
 cd frontend
-
-# Install dependencies
 npm install
+```
 
-# Start development server
+### 5. Run Everything
+
+**Terminal 1 — Backend API:**
+```bash
+venv\Scripts\uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+**Terminal 2 — Celery Worker:**
+```bash
+venv\Scripts\celery -A app.core.celery_app.celery_app worker --loglevel=info -P solo
+```
+
+**Terminal 3 — Frontend:**
+```bash
+cd frontend
 npm run dev
-
-# Frontend runs at http://localhost:5173
 ```
 
-## API Endpoints
+Open **http://localhost:5174** in your browser.
 
-All endpoints are prefixed with `/api/v1`
-
-### Authentication
-- `POST /auth/register` - Register new user
-- `POST /auth/login` - Login user
-- `GET /auth/me` - Get current user
-
-### Profiles
-- `GET /profiles` - List all profiles
-- `GET /profiles/{user_id}` - Get profile details
-- `PUT /profiles/{user_id}` - Update profile
-- `POST /profiles/{user_id}/skills` - Add skills to profile
-
-### Jobs
-- `POST /jobs` - Create new job posting
-- `GET /jobs` - List all jobs
-- `GET /jobs/{job_id}` - Get job details
-- `PUT /jobs/{job_id}` - Update job
-- `DELETE /jobs/{job_id}` - Delete job
-
-### Matching
-- `GET /matching/recommended` - Get recommended freelancers for job
-- `POST /matching/match-job` - Run matching algorithm
-
-### Proposals
-- `POST /proposals` - Submit proposal for job
-- `GET /proposals` - List proposals
-- `PUT /proposals/{proposal_id}` - Update proposal status
-
-### Contracts
-- `POST /contracts` - Create contract from accepted proposal
-- `GET /contracts` - List contracts
-- `PUT /contracts/{contract_id}` - Update contract status
-
-### Reviews
-- `POST /reviews` - Leave review
-- `GET /reviews/{user_id}` - Get reviews for user
-
-### Notifications
-- `GET /notifications` - Get user notifications
-- `PUT /notifications/{notification_id}` - Mark notification as read
-
-### System
-- `GET /health` - Health check endpoint
-
-Full API documentation available at `/docs` when running the backend.
-
-## Database Schema
-
-The platform uses the following main entities:
-
-- **users**: User accounts with authentication
-- **user_profiles**: Freelancer profile information with skills
-- **jobs**: Job postings by clients
-- **proposals**: Freelancer proposals for jobs
-- **contracts**: Accepted proposals converted to contracts
-- **reviews**: Ratings and reviews between users
-- **notifications**: System notifications for users
-
-## Configuration
-
-### Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-# Database
-DATABASE_URL=postgresql+asyncpg://freelance_user:freelance_pass@localhost:5432/freelance_db
-
-# Redis
-REDIS_URL=redis://localhost:6379
-
-# JWT
-SECRET_KEY=your-secret-key-change-in-production
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# CORS
-CORS_ORIGINS=http://localhost:5173,http://localhost:3000
-
-# App
-APP_NAME=Freelance Platform
-APP_VERSION=1.0.0
-```
-
-## Development
-
-### Running Tests
-```bash
-# Backend tests (if implemented)
-pytest
-
-# Frontend tests (if implemented)
-npm test
-```
-
-### Code Quality
-```bash
-# Lint frontend
-cd frontend && npm run lint
-
-# Format code
-# Add your formatter setup here
-```
-
-### Database Migrations
-
-Create a new migration:
-```bash
-alembic revision --autogenerate -m "description"
-```
-
-Apply migrations:
-```bash
-alembic upgrade head
-```
-
-Revert migration:
-```bash
-alembic downgrade -1
-```
-
-## Architecture
-
-### Backend Architecture
-- **Layered Architecture**: Controllers (Routers) → Services → Repositories → Models
-- **Dependency Injection**: FastAPI dependencies for database sessions and authentication
-- **Async/Await**: Full async support for better performance
-- **Background Tasks**: Celery for asynchronous job matching and notifications
-
-### Matching Algorithm
-The intelligent matching system uses:
-- Skill similarity matching based on user profiles
-- Job requirement analysis
-- Freelancer experience level evaluation
-- Historical success metrics
-
-### Security
-- JWT token-based authentication
-- Bcrypt password hashing
-- CORS middleware for cross-origin requests
-- Environment-based configuration management
-
-## Deployment
-
-### Docker Deployment
-```bash
-# Build and run with Docker Compose
-docker-compose up -d
-
-# View logs
-docker-compose logs -f backend frontend
-
-# Stop services
-docker-compose down
-```
-
-### Production Considerations
-- Use environment variables for sensitive data
-- Set up HTTPS/SSL certificates
-- Configure proper database backups
-- Use production-grade Redis configuration
-- Set up monitoring and logging
-- Configure proper CORS origins
-- Use a production ASGI server (Gunicorn)
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Support
-
-For support, email support@freelanceplatform.com or open an issue on GitHub.
-
-## Roadmap
-
-- [ ] Payment integration (Stripe)
-- [ ] Email notifications
-- [ ] Advanced search filters
-- [ ] Portfolio/work samples
-- [ ] Video call integration
-- [ ] Mobile app
-- [ ] Analytics dashboard
-- [ ] Multi-language support
+> The Vite dev server proxies all `/api` requests to the backend — no CORS configuration needed during development.
 
 ---
 
-**Built with ❤️ by the Freelance Platform Team**
+## 🌐 Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+# Application
+APP_NAME=EliteMatch
+APP_VERSION=1.0.0
+DEBUG=true
+
+# Database
+DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/freelance_db
+
+# Redis
+REDIS_URL=redis://localhost:6379/0
+
+# JWT
+JWT_SECRET_KEY=your-secret-key-here-change-in-production
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+REFRESH_TOKEN_EXPIRE_DAYS=7
+
+# Celery
+CELERY_BROKER_URL=redis://localhost:6379/1
+CELERY_RESULT_BACKEND=redis://localhost:6379/2
+
+# CORS — comma-separated allowed origins
+CORS_ORIGINS=["http://localhost:5173","http://localhost:5174","http://localhost:5175"]
+```
+
+---
+
+## ☁️ Free Hosting Deployment
+
+### Architecture
+
+```
+Browser → Vercel (React Frontend)
+            ↓ API calls
+         Render.com (FastAPI Backend)
+            ↓                ↓
+    Render PostgreSQL    Upstash Redis
+            ↓
+    Render Celery Worker
+```
+
+### Step 1 — Backend on Render.com
+
+1. Go to [render.com](https://render.com) and sign up (free)
+2. Click **New → Blueprint** and connect your GitHub repo
+3. Render will auto-detect `render.yaml` and create all services
+4. In the **Environment** tab, set:
+   - `DATABASE_URL` → your Render PostgreSQL internal URL
+   - `REDIS_URL` → your Upstash Redis URL
+   - `CELERY_BROKER_URL` → same Upstash Redis URL
+   - `CORS_ORIGINS` → `["https://your-app.vercel.app"]`
+
+### Step 2 — Redis on Upstash (Free)
+
+1. Go to [upstash.com](https://upstash.com) → Create Database → Free tier
+2. Copy the **Redis URL** (starts with `rediss://`)
+3. Use this URL for `REDIS_URL`, `CELERY_BROKER_URL`, and `CELERY_RESULT_BACKEND` in Render
+
+### Step 3 — Frontend on Vercel
+
+1. Go to [vercel.com](https://vercel.com) → New Project → Import GitHub repo
+2. Set **Root Directory** to `frontend`
+3. Add environment variable:
+   - `VITE_API_URL` = `https://elitematch-api.onrender.com/api/v1`
+4. Click **Deploy**
+
+### Step 4 — Run Database Migrations
+
+After Render deploys the backend:
+```bash
+# In Render Shell (or locally with production DATABASE_URL):
+alembic upgrade head
+```
+
+---
+
+## 📡 API Reference
+
+Full interactive API docs available at `/docs` (Swagger UI) and `/redoc` once the backend is running.
+
+### Auth
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/auth/register` | Register new user (client/freelancer) |
+| POST | `/api/v1/auth/login` | Login, returns JWT tokens |
+| POST | `/api/v1/auth/refresh` | Refresh access token |
+| POST | `/api/v1/auth/logout` | Revoke refresh token |
+| GET  | `/api/v1/auth/me` | Get current user details |
+
+### Jobs
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET  | `/api/v1/jobs` | List all open jobs |
+| POST | `/api/v1/jobs` | Create new job (client only) |
+| GET  | `/api/v1/jobs/{id}` | Get job details |
+| POST | `/api/v1/jobs/{id}/status` | Update job status |
+| GET  | `/api/v1/jobs/{id}/recommendations` | Get AI-matched freelancers |
+
+### Proposals
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/proposals` | Submit proposal (freelancer only) |
+| GET  | `/api/v1/proposals/me` | My submitted proposals |
+| GET  | `/api/v1/proposals/job/{id}` | Proposals for a job (client only) |
+
+### Contracts
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/contracts` | Create contract from accepted proposal |
+| GET  | `/api/v1/contracts/me` | My contracts |
+| POST | `/api/v1/contracts/{id}/complete` | Mark contract complete (client only) |
+
+---
+
+## 🔐 Security
+
+- Passwords hashed with **bcrypt** (work factor 12)
+- JWT tokens with short-lived access tokens (30 min) and rotating refresh tokens
+- Refresh tokens stored server-side and invalidated on logout
+- Role-based access control enforced on every endpoint
+- Input validation via Pydantic schemas (min/max length, non-negative values)
+
+---
+
+## 📜 License
+
+MIT — free to use, modify, and distribute.
+
+---
+
+<p align="center">Built with ❤️ — EliteMatch</p>

@@ -1,0 +1,70 @@
+# EliteMatch – Free Hosting Stack
+# Frontend  → Vercel
+# Backend   → Render.com (Web Service)
+# Database  → Render.com (PostgreSQL) or Supabase
+# Redis     → Upstash Redis (free tier)
+# Celery    → Render.com (Background Worker)
+
+services:
+  # ── FastAPI Backend ──────────────────────────────────────
+  - type: web
+    name: elitematch-api
+    env: python
+    region: singapore
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false          # Set in Render dashboard
+      - key: REDIS_URL
+        sync: false          # Set to Upstash Redis URL
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 30
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: 7
+      - key: CELERY_BROKER_URL
+        sync: false          # Upstash Redis URL
+      - key: CELERY_RESULT_BACKEND
+        sync: false          # Upstash Redis URL
+      - key: CORS_ORIGINS
+        sync: false          # Set to your Vercel frontend URL
+      - key: APP_NAME
+        value: EliteMatch
+      - key: APP_VERSION
+        value: 1.0.0
+      - key: DEBUG
+        value: false
+
+  # ── Celery Worker ────────────────────────────────────────
+  - type: worker
+    name: elitematch-worker
+    env: python
+    region: singapore
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A app.core.celery_app.celery_app worker --loglevel=info -P solo
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: CELERY_BROKER_URL
+        sync: false
+      - key: CELERY_RESULT_BACKEND
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+
+  # ── PostgreSQL Database ───────────────────────────────────
+  - type: pserv
+    name: elitematch-db
+    env: postgresql
+    region: singapore
+    plan: free
+    databaseName: freelance_db
+    databaseUser: freelance_user

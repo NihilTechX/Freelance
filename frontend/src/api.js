@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+// Dev: relative URL routes through Vite proxy → localhost:8000
+// Production: set VITE_API_URL=https://elitematch-api.onrender.com/api/v1 in Vercel
+const API_URL = import.meta.env.VITE_API_URL || '/api/v1';
+
 
 const api = axios.create({
   baseURL: API_URL,
