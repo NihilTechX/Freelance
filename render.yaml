@@ -50,15 +50,30 @@ services:
     startCommand: celery -A app.core.celery_app.celery_app worker --loglevel=info -P solo
     envVars:
       - key: DATABASE_URL
-        sync: false
+        fromService:
+          name: elitematch-api
+          type: web
+          envVarKey: DATABASE_URL
       - key: REDIS_URL
-        sync: false
+        fromService:
+          name: elitematch-api
+          type: web
+          envVarKey: REDIS_URL
       - key: CELERY_BROKER_URL
-        sync: false
+        fromService:
+          name: elitematch-api
+          type: web
+          envVarKey: CELERY_BROKER_URL
       - key: CELERY_RESULT_BACKEND
-        sync: false
+        fromService:
+          name: elitematch-api
+          type: web
+          envVarKey: CELERY_RESULT_BACKEND
       - key: JWT_SECRET_KEY
-        sync: false
+        fromService:
+          name: elitematch-api
+          type: web
+          envVarKey: JWT_SECRET_KEY
 
 # ── PostgreSQL Database ───────────────────────────────────
 databases:
