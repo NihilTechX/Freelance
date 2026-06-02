@@ -10,8 +10,8 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str
 
-    # Redis
-    REDIS_URL: str = "redis://localhost:6379/0"
+    # Redis (optional – leave empty to disable caching)
+    REDIS_URL: str = ""
 
     # JWT
     JWT_SECRET_KEY: str
@@ -19,9 +19,9 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
-    # Celery
-    CELERY_BROKER_URL: str = "redis://localhost:6379/1"
-    CELERY_RESULT_BACKEND: str = "redis://localhost:6379/2"
+    # Celery (optional – leave empty to disable background tasks)
+    CELERY_BROKER_URL: str = ""
+    CELERY_RESULT_BACKEND: str = ""
 
     # CORS
     CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174"]

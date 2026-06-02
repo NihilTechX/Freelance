@@ -15,8 +15,14 @@ import app.models.profile       # noqa: F401
 import app.models.proposal_contract  # noqa: F401
 import app.models.review_notification  # noqa: F401
 
-# Initialize Redis client for caching
-redis_client = redis.from_url(settings.REDIS_URL)
+# Initialize Redis client for caching (optional)
+_redis_client = None
+try:
+    if settings.REDIS_URL and settings.REDIS_URL.strip():
+        _redis_client = redis.from_url(settings.REDIS_URL)
+        _redis_client.ping()
+except Exception:
+    _redis_client = None
 
 async def _calculate_and_cache_recommendations(job_id_str: str):
     job_uuid = uuid.UUID(job_id_str)
@@ -45,13 +51,21 @@ async def _calculate_and_cache_recommendations(job_id_str: str):
                 }
             })
         
-        # Save to Redis cache for 1 hour
-        cache_key = f"job:recs:{job_id_str}"
-        redis_client.setex(cache_key, 3600, json.dumps(serialized_matches))
+        # Save to Redis cache for 1 hour (if available)
+        if _redis_client:
+            cache_key = f"job:recs:{job_id_str}"
+            _redis_client.setex(cache_key, 3600, json.dumps(serialized_matches))
         return serialized_matches
 
-@celery_app.task(name="app.tasks.matching_tasks.calculate_recs")
-def calculate_recs_task(job_id_str: str):
+
+def _make_task(fn, name):
+    """Register a Celery task only if Celery is available."""
+    if celery_app is not None:
+        return celery_app.task(name=name)(fn)
+    return fn  # return plain function as no-op fallback
+
+
+def _calculate_recs_sync(job_id_str: str):
     """Celery task to compute matching recommendations and cache in Redis."""
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -60,8 +74,12 @@ def calculate_recs_task(job_id_str: str):
     finally:
         loop.close()
 
-@celery_app.task(name="app.tasks.matching_tasks.send_matching_alert")
-def send_matching_alert_task(freelancer_id_str: str, job_id_str: str):
+
+def _send_matching_alert_sync(freelancer_id_str: str, job_id_str: str):
     """Mock background task to simulate emailing matching alerts to freelancers."""
     print(f"[MOCK ALERT] Notifying Freelancer {freelancer_id_str} about highly compatible Job {job_id_str}!")
     return True
+
+
+calculate_recs_task = _make_task(_calculate_recs_sync, "app.tasks.matching_tasks.calculate_recs")
+send_matching_alert_task = _make_task(_send_matching_alert_sync, "app.tasks.matching_tasks.send_matching_alert")

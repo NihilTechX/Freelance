@@ -19,7 +19,9 @@ from app.models.review_notification import Review, Notification
 config = context.config
 
 # Set the sqlalchemy.url dynamically from our settings
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+# asyncpg doesn't understand ?sslmode=require — translate to ?ssl=require
+_db_url = settings.DATABASE_URL.replace("?sslmode=require", "?ssl=require")
+config.set_main_option("sqlalchemy.url", _db_url)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

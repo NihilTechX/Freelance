@@ -2,9 +2,11 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from sqlalchemy.orm import DeclarativeBase
 from app.config import settings
 
+# asyncpg doesn't understand ?sslmode=require — translate to ?ssl=require
+_db_url = settings.DATABASE_URL.replace("?sslmode=require", "?ssl=require")
 
 engine = create_async_engine(
-    settings.DATABASE_URL,
+    _db_url,
     echo=settings.DEBUG,
     pool_size=20,
     max_overflow=10,

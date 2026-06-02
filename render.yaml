@@ -1,9 +1,7 @@
 # EliteMatch – Free Hosting Stack
 # Frontend  → Vercel
 # Backend   → Render.com (Web Service)
-# Database  → Render.com (PostgreSQL) or Supabase
-# Redis     → Upstash Redis (free tier)
-# Celery    → Render.com (Background Worker)
+# Database  → Neon.tech (Serverless PostgreSQL)
 
 services:
   # ── FastAPI Backend ──────────────────────────────────────
@@ -16,9 +14,9 @@ services:
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
-        sync: false          # Set in Render dashboard
+        sync: false          # Set to Neon PostgreSQL URL
       - key: REDIS_URL
-        sync: false          # Set to Upstash Redis URL
+        value: ""            # Optional — leave empty if no Redis
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: JWT_ALGORITHM
@@ -28,58 +26,14 @@ services:
       - key: REFRESH_TOKEN_EXPIRE_DAYS
         value: 7
       - key: CELERY_BROKER_URL
-        sync: false          # Upstash Redis URL
+        value: ""            # Not used without worker
       - key: CELERY_RESULT_BACKEND
-        sync: false          # Upstash Redis URL
+        value: ""            # Not used without worker
       - key: CORS_ORIGINS
-        sync: false          # Set to your Vercel frontend URL
+        value: '["https://freelance-pi-gold.vercel.app"]'
       - key: APP_NAME
         value: EliteMatch
       - key: APP_VERSION
         value: 1.0.0
       - key: DEBUG
         value: false
-
-  # ── Celery Worker ────────────────────────────────────────
-  - type: worker
-    name: elitematch-worker
-    env: python
-    region: singapore
-    plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: celery -A app.core.celery_app.celery_app worker --loglevel=info -P solo
-    envVars:
-      - key: DATABASE_URL
-        fromService:
-          name: elitematch-api
-          type: web
-          envVarKey: DATABASE_URL
-      - key: REDIS_URL
-        fromService:
-          name: elitematch-api
-          type: web
-          envVarKey: REDIS_URL
-      - key: CELERY_BROKER_URL
-        fromService:
-          name: elitematch-api
-          type: web
-          envVarKey: CELERY_BROKER_URL
-      - key: CELERY_RESULT_BACKEND
-        fromService:
-          name: elitematch-api
-          type: web
-          envVarKey: CELERY_RESULT_BACKEND
-      - key: JWT_SECRET_KEY
-        fromService:
-          name: elitematch-api
-          type: web
-          envVarKey: JWT_SECRET_KEY
-
-# ── PostgreSQL Database ───────────────────────────────────
-databases:
-  - name: elitematch-db
-    databaseName: freelance_db
-    user: freelance_user
-    plan: free
-    region: singapore
-
