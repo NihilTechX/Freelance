@@ -897,6 +897,12 @@ function ContractsView({ contracts, user, onComplete, onReview, triggerAlert }) 
   const sendMessage = () => {
     const content = msgInput.trim();
     if (!content || !wsRef.current) return;
+    
+    if (wsRef.current.readyState !== WebSocket.OPEN) {
+      triggerAlert('error', 'Chat is connecting... please wait a moment and try again.');
+      return;
+    }
+    
     wsRef.current.send(JSON.stringify({ content }));
     setMsgInput('');
   };
