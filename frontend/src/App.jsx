@@ -648,14 +648,18 @@ function FindProjects({ triggerAlert, onProposalSent }) {
   const [rate, setRate] = useState(50);
   const [cover, setCover] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
-    api.get('/jobs').then(r => setJobs(r.data.filter(j => j.status === 'open'))).catch(() => {});
+    api.get('/jobs')
+       .then(r => setJobs(r.data.filter(j => j.status === 'open')))
+       .catch(() => {})
+       .finally(() => setFetching(false));
   }, []);
 
   const filtered = jobs.filter(j =>
-    j.title.toLowerCase().includes(search.toLowerCase()) ||
-    j.description.toLowerCase().includes(search.toLowerCase())
+    (j.title || '').toLowerCase().includes(search.toLowerCase()) ||
+    (j.description || '').toLowerCase().includes(search.toLowerCase())
   );
 
   const handlePropose = async (e) => {
@@ -681,13 +685,15 @@ function FindProjects({ triggerAlert, onProposalSent }) {
         <input className="search-input" placeholder="Search projects by title, skill, or keyword…" value={search} onChange={e => setSearch(e.target.value)} />
       </div>
 
-      {filtered.length === 0 && (
+      {fetching ? (
+        <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>Loading projects...</div>
+      ) : filtered.length === 0 ? (
         <div className="empty-state">
           <div className="empty-state-icon">🔍</div>
           <div className="empty-state-title">No projects found</div>
           <div className="empty-state-desc">Try a different search term or check back later for new opportunities.</div>
         </div>
-      )}
+      ) : (
 
       <div style={{ display: 'grid', gap: '16px' }}>
         {filtered.map(job => (
@@ -714,6 +720,7 @@ function FindProjects({ triggerAlert, onProposalSent }) {
           </div>
         ))}
       </div>
+      )}
 
       {/* Proposal Modal */}
       {selectedJob && (
