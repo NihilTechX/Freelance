@@ -26,6 +26,11 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173", "http://localhost:5174"]
 
+    # Stripe (Test Mode)
+    STRIPE_SECRET_KEY: str = ""
+    STRIPE_WEBHOOK_SECRET: str = ""
+    FRONTEND_URL: str = "http://localhost:5173"
+
     model_config = {
         "env_file": ".env",
         "env_file_encoding": "utf-8",

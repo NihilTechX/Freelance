@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Briefcase, Search, Bell, LogOut, Plus, Star, CheckCircle2,
   AlertCircle, TrendingUp, FileText, ChevronRight, User,
   Building, Globe, Clock, Shield, Zap, Award, BarChart3,
-  ArrowRight, Menu, X, Check, Edit3, Send
+  ArrowRight, Menu, X, Check, Edit3, Send, MessageCircle, CreditCard
 } from 'lucide-react';
-import api, { clearAuth } from './api';
+import api, { clearAuth, getWsUrl } from './api';
 import './index.css';
 
 /* ─── Constants ─── */
@@ -837,9 +837,95 @@ function FreelancerDashboard({ proposals, contracts, setTab }) {
    CONTRACTS VIEW (Shared)
 ═══════════════════════════════════════════════════════════ */
 function ContractsView({ contracts, user, onComplete, onReview, triggerAlert }) {
-  const [reviewModal, setReviewModal] = useState(null);
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState('');
+  const [reviewModal, setReviewModal]   = useState(null);
+  const [rating, setRating]             = useState(5);
+  const [comment, setComment]           = useState('');
+  const [chatContract, setChatContract] = useState(null); // contract object shown in chat panel
+  const [messages, setMessages]         = useState([]);
+  const [msgInput, setMsgInput]         = useState('');
+  const [payStatus, setPayStatus]       = useState({});   // { [contractId]: paymentObj }
+  const wsRef        = useRef(null);
+  const chatBottomRef = useRef(null);
+
+  /* ── Load payment status for all active contracts ── */
+  useEffect(() => {
+    const fetchPayments = async () => {
+      const active = contracts.filter(c => c.status === 'active');
+      const results = {};
+      for (const c of active) {
+        try {
+          const res = await api.get(`/payments/${c.id}`);
+          results[c.id] = res.data;
+        } catch (_) {
+          results[c.id] = null; // no payment record yet
+        }
+      }
+      setPayStatus(results);
+    };
+    if (contracts.length > 0) fetchPayments();
+  }, [contracts]);
+
+  /* ── Open Chat ── */
+  const openChat = async (contract) => {
+    setChatContract(contract);
+    // Fetch history
+    try {
+      const res = await api.get(`/messages/${contract.id}`);
+      setMessages(res.data);
+    } catch (_) { setMessages([]); }
+
+    // Open WebSocket
+    const token = localStorage.getItem('access_token');
+    const wsBase = getWsUrl();
+    const ws = new WebSocket(`${wsBase}/messages/ws/${contract.id}?token=${token}`);
+    ws.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      setMessages(prev => [...prev, msg]);
+    };
+    ws.onerror = () => {};
+    wsRef.current = ws;
+  };
+
+  const closeChat = () => {
+    wsRef.current?.close();
+    wsRef.current = null;
+    setChatContract(null);
+    setMessages([]);
+    setMsgInput('');
+  };
+
+  const sendMessage = () => {
+    const content = msgInput.trim();
+    if (!content || !wsRef.current) return;
+    wsRef.current.send(JSON.stringify({ content }));
+    setMsgInput('');
+  };
+
+  /* ── Auto-scroll chat to bottom ── */
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  /* ── Payment helpers ── */
+  const fundContract = async (contractId) => {
+    try {
+      const res = await api.post(`/payments/checkout-session/${contractId}`);
+      window.location.href = res.data.checkout_url; // redirect to Stripe
+    } catch (err) {
+      triggerAlert('error', err.response?.data?.message || 'Payment failed to initialize.');
+    }
+  };
+
+  const releaseFunds = async (contractId) => {
+    try {
+      const res = await api.post(`/payments/release/${contractId}`);
+      setPayStatus(prev => ({ ...prev, [contractId]: res.data }));
+      triggerAlert('success', 'Funds released! The contract is now marked complete.');
+      onComplete && onComplete(contractId);
+    } catch (err) {
+      triggerAlert('error', err.response?.data?.message || 'Could not release funds.');
+    }
+  };
 
   const handleReview = async (e) => {
     e.preventDefault();
@@ -852,11 +938,20 @@ function ContractsView({ contracts, user, onComplete, onReview, triggerAlert }) 
     }
   };
 
+  const paymentBadge = (contractId) => {
+    const p = payStatus[contractId];
+    if (!p) return <span className="badge badge-gray">Unpaid</span>;
+    if (p.status === 'held_in_escrow') return <span className="badge badge-navy">💰 Escrowed</span>;
+    if (p.status === 'released')       return <span className="badge badge-green">✅ Paid</span>;
+    if (p.status === 'pending')        return <span className="badge badge-gold">Pending</span>;
+    return null;
+  };
+
   return (
     <div>
       <div className="page-header">
         <h1 className="page-title">Contracts</h1>
-        <p className="page-subtitle">All your project contracts and their status</p>
+        <p className="page-subtitle">All your project contracts — chat, pay, and track progress</p>
       </div>
 
       {contracts.length === 0 ? (
@@ -869,7 +964,7 @@ function ContractsView({ contracts, user, onComplete, onReview, triggerAlert }) 
         <div className="card" style={{ overflow: 'hidden' }}>
           <table className="data-table">
             <thead>
-              <tr><th>Project</th><th>Status</th><th>Started</th><th>Actions</th></tr>
+              <tr><th>Project</th><th>Status</th><th>Payment</th><th>Started</th><th>Actions</th></tr>
             </thead>
             <tbody>
               {contracts.map(c => (
@@ -880,16 +975,48 @@ function ContractsView({ contracts, user, onComplete, onReview, triggerAlert }) 
                       {c.status === 'active' ? 'In Progress' : c.status}
                     </span>
                   </td>
+                  <td>{c.status === 'active' ? paymentBadge(c.id) : '—'}</td>
                   <td style={{ color: 'var(--text-muted)', fontSize: '13px' }}>{c.start_date ? new Date(c.start_date).toLocaleDateString() : '—'}</td>
                   <td>
-                    {user?.role === 'client' && c.status === 'active' && (
-                      <button className="btn btn-green btn-sm" onClick={() => onComplete(c.id)}>Mark Complete</button>
-                    )}
-                    {c.status === 'completed' && (
-                      <button className="btn btn-outline-gray btn-sm" onClick={() => setReviewModal(c)}>
-                        <Star size={13} /> Leave Review
-                      </button>
-                    )}
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                      {/* Chat button — available for active contracts to both roles */}
+                      {c.status === 'active' && (
+                        <button className="btn btn-outline-gray btn-sm" onClick={() => openChat(c)}>
+                          <MessageCircle size={13} /> Chat
+                        </button>
+                      )}
+
+                      {/* Payment buttons — client only */}
+                      {user?.role === 'client' && c.status === 'active' && (() => {
+                        const p = payStatus[c.id];
+                        if (!p || p.status === 'pending') {
+                          return (
+                            <button className="btn btn-gold btn-sm" onClick={() => fundContract(c.id)}>
+                              <CreditCard size={13} /> Fund Contract
+                            </button>
+                          );
+                        }
+                        if (p.status === 'held_in_escrow') {
+                          return (
+                            <button className="btn btn-green btn-sm" onClick={() => releaseFunds(c.id)}>
+                              <CheckCircle2 size={13} /> Release & Complete
+                            </button>
+                          );
+                        }
+                        return null;
+                      })()}
+
+                      {/* Legacy complete without payment */}
+                      {user?.role === 'client' && c.status === 'active' && !payStatus[c.id] && (
+                        <button className="btn btn-outline-gray btn-sm" onClick={() => onComplete(c.id)}>Mark Complete</button>
+                      )}
+
+                      {c.status === 'completed' && (
+                        <button className="btn btn-outline-gray btn-sm" onClick={() => setReviewModal(c)}>
+                          <Star size={13} /> Leave Review
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -898,6 +1025,68 @@ function ContractsView({ contracts, user, onComplete, onReview, triggerAlert }) 
         </div>
       )}
 
+      {/* ── Chat Slide-in Panel ── */}
+      {chatContract && (
+        <div className="modal-overlay" onClick={e => e.target === e.currentTarget && closeChat()}>
+          <div className="modal" style={{ maxWidth: '520px', height: '80vh', display: 'flex', flexDirection: 'column', padding: 0 }}>
+            {/* Header */}
+            <div className="modal-header" style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)' }}>
+              <div className="modal-title">
+                <MessageCircle size={18} style={{ marginRight: '8px', display: 'inline' }} />
+                {chatContract.job_title || 'Contract Chat'}
+              </div>
+              <button className="modal-close" onClick={closeChat}>×</button>
+            </div>
+
+            {/* Messages */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {messages.length === 0 && (
+                <div style={{ textAlign: 'center', color: 'var(--text-muted)', marginTop: '40px' }}>
+                  <MessageCircle size={32} style={{ opacity: 0.3, display: 'block', margin: '0 auto 8px' }} />
+                  No messages yet — say hello!
+                </div>
+              )}
+              {messages.map((m, i) => {
+                const isMine = m.sender_id === user?.id;
+                return (
+                  <div key={m.id || i} style={{ display: 'flex', justifyContent: isMine ? 'flex-end' : 'flex-start' }}>
+                    <div style={{
+                      maxWidth: '72%', padding: '10px 14px', borderRadius: '18px',
+                      background: isMine ? 'var(--gold)' : 'var(--card-hover)',
+                      color: isMine ? '#fff' : 'var(--text)',
+                      fontSize: '14px', lineHeight: '1.4',
+                    }}>
+                      {!isMine && <div style={{ fontSize: '11px', fontWeight: '600', marginBottom: '4px', opacity: 0.7 }}>{m.sender_email || 'Them'}</div>}
+                      {m.content}
+                      <div style={{ fontSize: '10px', marginTop: '4px', opacity: 0.6, textAlign: 'right' }}>
+                        {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              <div ref={chatBottomRef} />
+            </div>
+
+            {/* Input */}
+            <div style={{ padding: '12px 16px', borderTop: '1px solid var(--border)', display: 'flex', gap: '8px' }}>
+              <input
+                className="form-input"
+                style={{ flex: 1, margin: 0 }}
+                placeholder="Type a message…"
+                value={msgInput}
+                onChange={e => setMsgInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage())}
+              />
+              <button className="btn btn-green" style={{ padding: '0 16px' }} onClick={sendMessage}>
+                <Send size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Review Modal ── */}
       {reviewModal && (
         <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setReviewModal(null)}>
           <div className="modal">

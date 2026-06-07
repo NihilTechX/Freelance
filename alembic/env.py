@@ -13,6 +13,8 @@ from app.models.profile import ClientProfile, FreelancerProfile, Skill
 from app.models.job import Job
 from app.models.proposal_contract import Proposal, Contract
 from app.models.review_notification import Review, Notification
+from app.models.message import Message
+from app.models.payment import Payment
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

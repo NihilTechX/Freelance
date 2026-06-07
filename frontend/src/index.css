@@ -410,6 +410,13 @@ img { display: block; max-width: 100%; }
 }
 .btn-danger:hover { background: #b91c1c; }
 
+.btn-gold {
+  background: var(--gold);
+  color: var(--white);
+}
+.btn-gold:hover { background: var(--gold-dark, #b45309); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(212, 160, 23, 0.35); }
+
+
 /* ============================================================
    FORM ELEMENTS
    ============================================================ */

@@ -28,6 +28,7 @@ numpy==2.2.1
 
 # HTTP
 httpx==0.28.1
+stripe==12.2.0
 
 # Utilities
 python-dotenv==1.0.1

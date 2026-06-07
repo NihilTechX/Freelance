@@ -35,3 +35,6 @@ def verify_token(token: str) -> Optional[str]:
         return payload.get("sub")
     except JWTError:
         return None
+
+# Alias used by WebSocket endpoints (tokens come via query param, not header)
+decode_token = verify_token

@@ -4,6 +4,19 @@ import axios from 'axios';
 // Production: set VITE_API_URL=https://elitematch-api.onrender.com/api/v1 in Vercel
 const API_URL = import.meta.env.VITE_API_URL || '/api/v1';
 
+/**
+ * Returns the WebSocket base URL derived from the HTTP API URL.
+ * e.g. https://elitematch-api.onrender.com/api/v1  →  wss://elitematch-api.onrender.com/api/v1
+ *      /api/v1 (local dev)                         →  ws://localhost:8000/api/v1
+ */
+export const getWsUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.replace(/^https/, 'wss').replace(/^http/, 'ws');
+  }
+  // Local dev: proxy not available for WS, connect directly
+  return 'ws://localhost:8000/api/v1';
+};
+
 
 const api = axios.create({
   baseURL: API_URL,

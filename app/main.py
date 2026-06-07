@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.routers import auth, profiles, jobs, matching, proposals, contracts, reviews, notifications
+from app.routers import auth, profiles, jobs, matching, proposals, contracts, reviews, notifications, messages, payments
 from app.core.exceptions import register_exception_handlers
 
 
@@ -29,6 +29,8 @@ def create_app() -> FastAPI:
     application.include_router(contracts.router, prefix="/api/v1")
     application.include_router(reviews.router, prefix="/api/v1")
     application.include_router(notifications.router, prefix="/api/v1")
+    application.include_router(messages.router, prefix="/api/v1")
+    application.include_router(payments.router, prefix="/api/v1")
 
     register_exception_handlers(application)
 
