@@ -233,37 +233,70 @@ function LandingPage({ onHire, onFindWork }) {
         </section>
 
         <section className="section-shell section-audience">
-          <div className="audience-copy" id="clients">
-            <h2>For Clients & Freelancers</h2>
-            <p>
-              Whether you need skilled professionals or want to showcase your mathematical talent, EliteMatch is the perfect place to grow and succeed.
-            </p>
-            <div className="audience-actions">
-              <button className="audience-btn primary" onClick={onHire}>I’m a Client <ArrowRight size={16} /></button>
-              <button className="audience-btn" onClick={onFindWork}>I’m a Freelancer <ArrowRight size={16} /></button>
-            </div>
-          </div>
-          <div className="audience-visual" id="freelancers" aria-hidden="true">
-            <div className="audience-screen">
-              <div className="screen-topbar">
-                <span />
-                <span />
-                <span />
-              </div>
-              <div className="screen-chart">
-                <div />
-                <div />
-                <div />
-                <div />
-              </div>
-              <div className="screen-card-row">
-                <div className="screen-chip" />
-                <div className="screen-chip" />
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
+  <div className="audience-copy" id="clients">
+    <h2>For Clients & Freelancers</h2>
+
+    <p>
+      Whether you need skilled professionals or want to showcase your
+      professional skills, EliteMatch is the perfect place to grow and
+      succeed.
+    </p>
+
+    <div className="audience-actions">
+      <button className="audience-btn primary" onClick={onHire}>
+        I’m a Client <ArrowRight size={16} />
+      </button>
+
+      <button className="audience-btn" onClick={onFindWork}>
+        I’m a Freelancer <ArrowRight size={16} />
+      </button>
+    </div>
+  </div>
+
+  {/* Modify this card with some content */}
+  <div className="audience-visual" id="freelancers" aria-hidden="true">
+
+    {/* Make it prettier */}
+    <div className="audience-screen">
+      <div className="screen-topbar">
+        <span />
+        <span />
+        <span />
+      </div>
+
+      <div className="screen-chart">
+        <div />
+        <div />
+        <div />
+        <div />
+      </div>
+
+      <div className="screen-card-row">
+        <div className="screen-chip">
+          <strong>48h</strong>
+          <span>Average match time</span>
+        </div>
+
+        <div className="screen-chip">
+          <strong>4.9/5</strong>
+          <span>Top freelancer rating</span>
+        </div>
+      </div>
+
+      <div className="screen-insight">
+        <div>
+          <strong>1,240</strong>
+          <span>Projects matched this month</span>
+        </div>
+
+        <div className="screen-mini-progress">
+          <span style={{ width: "82%" }} />
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
 
       <footer className="landing-footer">
         <div className="footer-top">
