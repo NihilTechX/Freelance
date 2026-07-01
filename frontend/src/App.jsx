@@ -40,161 +40,269 @@ function Toast({ alert }) {
    LANDING PAGE
 ═══════════════════════════════════════════════════════════ */
 function LandingPage({ onHire, onFindWork }) {
+  const featureCards = [
+    {
+      icon: <Search size={22} />,
+      title: 'AI-Powered Matching',
+      desc: 'We surface the best-fit talent based on skills, experience, and prior work.',
+      tone: 'violet',
+    },
+    {
+      icon: <Shield size={22} />,
+      title: 'Secure Collaboration',
+      desc: 'Built-in safeguards for payments, approvals, and trusted project delivery.',
+      tone: 'blue',
+    },
+    {
+      icon: <Zap size={22} />,
+      title: 'Fast Hiring Flow',
+      desc: 'Post, match, and start working in minutes with a focused hiring workflow.',
+      tone: 'indigo',
+    },
+  ];
+
+  const processSteps = [
+    { n: '1', title: 'Post a Project', desc: 'Describe the work and specialized requirements.' },
+    { n: '2', title: 'Get Matched', desc: 'Review the best freelancers and technical experts.' },
+    { n: '3', title: 'Collaborate', desc: 'Chat, share files, and track progress together.' },
+    { n: '4', title: 'Complete & Pay', desc: 'Approve the work and release secure payments.' },
+  ];
+
+  const stats = [
+    { value: '10K+', label: 'Freelancers' },
+    { value: '5K+', label: 'Clients' },
+    { value: '50K+', label: 'Projects Completed' },
+    { value: '98%', label: 'Satisfaction Rate' },
+  ];
+
   return (
     <div className="landing-page">
-      {/* Hero */}
-      <section className="hero">
-        <div className="hero-content">
-          <div className="hero-eyebrow">
-            <Shield size={14} /> Trusted by 50,000+ companies worldwide
+      <header className="landing-nav">
+        <div className="landing-brand">
+          <div className="landing-brand-mark">
+            <Briefcase size={18} color="#f4efff" />
           </div>
-          <h1 className="hero-title">
-            Find the <span className="hero-title-accent">Perfect Talent</span><br />
-            For Every Project
-          </h1>
-          <p className="hero-sub">
-            EliteMatch connects businesses with world-class freelancers. Post a project, receive proposals, and hire the best — all in one place.
-          </p>
-          <div className="hero-ctas">
-            <button className="hero-btn-primary" onClick={onHire}>
-              Post a Project <ArrowRight size={18} />
-            </button>
-            <button className="hero-btn-secondary" onClick={onFindWork}>
-              Find Work <ChevronRight size={18} />
-            </button>
-          </div>
+          <span>EliteMatch</span>
         </div>
-      </section>
 
-      {/* Trust Bar */}
-      <div className="trust-bar">
-        <div className="trust-bar-inner">
-          <span className="trust-label">Trusted by teams at</span>
-          <div className="trust-divider" />
-          <div className="trust-stat">
-            <span className="trust-stat-num">2M+</span>
-            <span className="trust-stat-txt">Freelancers</span>
-          </div>
-          <div className="trust-divider" />
-          <div className="trust-stat">
-            <span className="trust-stat-num">500K+</span>
-            <span className="trust-stat-txt">Projects Done</span>
-          </div>
-          <div className="trust-divider" />
-          <div className="trust-stat">
-            <span className="trust-stat-num">98%</span>
-            <span className="trust-stat-txt">Success Rate</span>
-          </div>
-          <div className="trust-divider" />
-          <div className="trust-stat">
-            <span className="trust-stat-num">4.9★</span>
-            <span className="trust-stat-txt">Avg Rating</span>
-          </div>
-        </div>
-      </div>
+        <nav className="landing-links" aria-label="Primary">
+          <a href="#how-it-works">How It Works</a>
+          <a href="#clients">For Clients</a>
+          <a href="#freelancers">For Freelancers</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#resources">Resources</a>
+        </nav>
 
-      {/* Features */}
-      <section className="features-section">
-        <div className="features-inner">
-          <p className="section-eyebrow">Why EliteMatch</p>
-          <h2 className="section-title">Everything you need to<br />hire with confidence</h2>
-          <p className="section-sub">From AI-powered matching to secure payments, we've built every tool you need to find and work with the best talent.</p>
-          <div className="features-grid">
-            {[
-              { icon: '🤝', iconClass: 'green', title: 'Smart Matching', desc: 'Our intelligent matching algorithm analyzes skills, experience, and project requirements to surface the best candidates instantly.' },
-              { icon: '🔒', iconClass: 'navy', title: 'Secure Escrow', desc: 'Every contract is protected by our built-in escrow system. Funds are held safely and released only when work is approved.' },
-              { icon: '⚡', iconClass: 'gold', title: 'Fast Hiring', desc: 'Post a project and start receiving proposals within hours. Our streamlined workflow lets you go from idea to hired in days.' },
-              { icon: '⭐', iconClass: 'green', title: 'Verified Talent', desc: 'Every freelancer is reviewed and rated by real clients. Browse portfolios, reviews, and skill assessments before you hire.' },
-              { icon: '💬', iconClass: 'navy', title: 'Real-time Updates', desc: 'Stay informed with live notifications for proposals, messages, and contract milestones throughout your project.' },
-              { icon: '📊', iconClass: 'gold', title: 'Transparent Pricing', desc: 'See hourly rates and fixed-price quotes upfront. No hidden fees. Pay only for approved, completed work.' },
-            ].map((f) => (
-              <div className="feature-card" key={f.title}>
-                <div className={`feature-icon ${f.iconClass}`}>{f.icon}</div>
-                <h3 className="feature-card-title">{f.title}</h3>
-                <p className="feature-card-desc">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        <button className="landing-cta" onClick={onHire}>Get Started</button>
+      </header>
 
-      {/* How it Works */}
-      <section className="how-section">
-        <div className="how-inner">
-          <p className="section-eyebrow">How it works</p>
-          <h2 className="section-title">Hire talent in 4 simple steps</h2>
-          <div className="steps-row">
-            {[
-              { n: '1', title: 'Post Your Project', desc: 'Describe what you need, set your budget, and specify the skills required.' },
-              { n: '2', title: 'Review Proposals', desc: 'Qualified freelancers submit proposals. Browse profiles, portfolios, and ratings.' },
-              { n: '3', title: 'Start Working', desc: 'Hire the right talent, sign a contract, and collaborate with ease.' },
-              { n: '4', title: 'Pay Securely', desc: 'Approve completed work and release payment from your protected escrow.' },
-            ].map((s) => (
-              <div className="step" key={s.n}>
-                <div className="step-num">{s.n}</div>
-                <h4 className="step-title">{s.title}</h4>
-                <p className="step-desc">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Browse Categories */}
-      <section className="categories-section">
-        <div className="categories-inner">
-          <h2 className="categories-title">Browse by Category</h2>
-          <p className="categories-sub">Find specialists in every field</p>
-          <div className="categories-grid">
-            {CATEGORIES.map((c) => (
-              <div className="category-chip" key={c.label} onClick={onFindWork}>
-                <div className="category-chip-icon">{c.icon}</div>
-                <div className="category-chip-label">{c.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="cta-section">
-        <div className="cta-inner">
-          <h2 className="cta-title">Ready to get started?</h2>
-          <p className="cta-sub">Join thousands of businesses and freelancers already growing on EliteMatch.</p>
-          <div className="cta-btns">
-            <button className="hero-btn-primary" onClick={onHire}>
-              I Need to Hire <ArrowRight size={18} />
-            </button>
-            <button className="hero-btn-secondary" onClick={onFindWork}>
-              I Want to Work
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="footer">
-        <div className="footer-inner">
-          <div className="footer-grid">
-            <div>
-              <div className="footer-brand-name">EliteMatch</div>
-              <p className="footer-brand-desc">The professional freelance marketplace connecting world-class talent with ambitious companies.</p>
+      <main>
+        <section className="landing-hero">
+          <div className="landing-hero-copy">
+            <p className="landing-kicker">EliteMatch connects specialized talent with fast-moving teams</p>
+            <h1 className="landing-title">
+              Find Talent.
+              <br />
+              Get Work. <span>Grow Together.</span>
+            </h1>
+            <p className="landing-subtitle">
+              EliteMatch connects businesses with top specialized mathematical and technical talent using AI-powered matching for smarter, faster, and hassle-free hiring.
+            </p>
+            <div className="landing-actions">
+              <button className="landing-primary-btn" onClick={onHire}>
+                Hire Top Talent
+                <span className="landing-btn-arrow"><ArrowRight size={18} /></span>
+              </button>
+              <button className="landing-secondary-btn" onClick={onFindWork}>
+                Find Work
+              </button>
             </div>
-            {[
-              { title: 'For Clients', links: ['Post a Project', 'Browse Talent', 'Enterprise', 'Pricing'] },
-              { title: 'For Freelancers', links: ['Find Projects', 'Create Profile', 'Resources', 'Community'] },
-              { title: 'Company', links: ['About Us', 'Careers', 'Blog', 'Contact'] },
-            ].map((col) => (
-              <div key={col.title}>
-                <div className="footer-col-title">{col.title}</div>
-                {col.links.map(l => <span key={l} className="footer-link">{l}</span>)}
+            <div className="landing-stats" aria-label="Platform statistics">
+              {stats.map((stat) => (
+                <div key={stat.label} className="landing-stat">
+                  <strong>{stat.value}</strong>
+                  <span>{stat.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="landing-hero-visual" aria-hidden="true">
+            <div className="visual-orbit visual-orbit-one" />
+            <div className="visual-orbit visual-orbit-two" />
+            <div className="glass-card glass-card-back" />
+            <div className="glass-card glass-card-top">
+              <div className="glass-window" />
+            </div>
+            <div className="glass-card profile-card profile-card-main">
+              <div className="profile-ring">
+                <User size={30} />
               </div>
+              <div className="profile-lines">
+                <span />
+                <span />
+                <span />
+              </div>
+              <div className="mini-badge">&lt;/&gt;</div>
+            </div>
+            <div className="glass-card profile-card profile-card-side">
+              <div className="profile-avatar">+</div>
+              <div className="profile-lines compact">
+                <span />
+                <span />
+                <span />
+              </div>
+            </div>
+            <div className="glass-card profile-card profile-card-small">
+              <div className="profile-avatar alt">×</div>
+              <div className="profile-lines compact">
+                <span />
+                <span />
+              </div>
+            </div>
+            <div className="glass-node glass-node-top" />
+            <div className="glass-node glass-node-left" />
+            <div className="glass-node glass-node-bottom" />
+            <div className="glass-node glass-node-right" />
+          </div>
+        </section>
+
+        <section className="section-shell section-features">
+          <div className="section-heading">
+            <h2>Why EliteMatch?</h2>
+            <p>Specialized talent, secure collaboration, and seamless workflows for high-trust hiring.</p>
+          </div>
+          <div className="feature-grid">
+            {featureCards.map((card) => (
+              <article key={card.title} className={`feature-panel ${card.tone}`}>
+                <div className="feature-icon-wrap">{card.icon}</div>
+                <h3>{card.title}</h3>
+                <p>{card.desc}</p>
+              </article>
             ))}
           </div>
-          <div className="footer-bottom">
-            <span className="footer-copy">© 2025 EliteMatch. All rights reserved.</span>
-            <span className="footer-copy">Privacy · Terms · Security</span>
+          <div className="center-action">
+            <button className="landing-secondary-btn dark">Explore More <ArrowRight size={16} /></button>
           </div>
+        </section>
+
+        <section className="section-shell section-how" id="how-it-works">
+          <div className="section-heading">
+            <h2>How EliteMatch Works</h2>
+            <p>A simple process for connecting specialized talent and clients.</p>
+          </div>
+          <div className="process-grid">
+            {processSteps.map((step) => (
+              <article key={step.n} className="process-step">
+                <div className="process-step-number">{step.n}</div>
+                <h3>{step.title}</h3>
+                <p>{step.desc}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="trust-panel">
+            <div className="trust-copy">
+              <p className="trust-copy-title">Trusted by thousands worldwide</p>
+              <p>Join a growing community of clients and freelancers choosing a more focused marketplace.</p>
+              <button className="trust-btn" onClick={onHire}>Join EliteMatch <ArrowRight size={16} /></button>
+            </div>
+            <div className="trust-metrics">
+              <div>
+                <Building size={22} />
+                <strong>10K+</strong>
+                <span>Active Freelancers</span>
+              </div>
+              <div>
+                <Globe size={22} />
+                <strong>5K+</strong>
+                <span>Happy Clients</span>
+              </div>
+              <div>
+                <Clock size={22} />
+                <strong>50K+</strong>
+                <span>Projects Completed</span>
+              </div>
+              <div>
+                <Star size={22} />
+                <strong>4.9/5</strong>
+                <span>Average Rating</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="section-shell section-audience">
+          <div className="audience-copy" id="clients">
+            <h2>For Clients & Freelancers</h2>
+            <p>
+              Whether you need skilled professionals or want to showcase your mathematical talent, EliteMatch is the perfect place to grow and succeed.
+            </p>
+            <div className="audience-actions">
+              <button className="audience-btn primary" onClick={onHire}>I’m a Client <ArrowRight size={16} /></button>
+              <button className="audience-btn" onClick={onFindWork}>I’m a Freelancer <ArrowRight size={16} /></button>
+            </div>
+          </div>
+          <div className="audience-visual" id="freelancers" aria-hidden="true">
+            <div className="audience-screen">
+              <div className="screen-topbar">
+                <span />
+                <span />
+                <span />
+              </div>
+              <div className="screen-chart">
+                <div />
+                <div />
+                <div />
+                <div />
+              </div>
+              <div className="screen-card-row">
+                <div className="screen-chip" />
+                <div className="screen-chip" />
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="landing-footer">
+        <div className="footer-top">
+          <div>
+            <div className="footer-brand">Elite Match</div>
+            <p>The smart freelance marketplace for specialized talent, collaboration, and growth.</p>
+          </div>
+          <div>
+            <h4>Platform</h4>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#resources">Resources</a>
+            <a href="#">Help Center</a>
+          </div>
+          <div>
+            <h4>Company</h4>
+            <a href="#">About Us</a>
+            <a href="#">Careers</a>
+            <a href="#">Blog</a>
+            <a href="#">Contact</a>
+          </div>
+          <div>
+            <h4>Legal</h4>
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Cookie Policy</a>
+          </div>
+          <div>
+            <h4>Stay Connected</h4>
+            <div className="social-row">
+              <span>t</span>
+              <span>in</span>
+              <span>ig</span>
+              <span>gh</span>
+            </div>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <span>© 2025 Elite Match. All rights reserved.</span>
         </div>
       </footer>
     </div>
@@ -406,12 +514,14 @@ function Navbar({ user, notifications, onNotifClick, showNotif, onMarkAll, onMar
 function Sidebar({ user, activeTab, setActiveTab, onLogout }) {
   const clientLinks = [
     { id: 'dashboard', icon: <BarChart3 size={18} />, label: 'Dashboard' },
+    { id: 'messages',  icon: <MessageCircle size={18} />, label: 'Messages' },
     { id: 'post-job',  icon: <Plus size={18} />,      label: 'Post a Job' },
     { id: 'my-jobs',   icon: <Briefcase size={18} />, label: 'My Projects' },
     { id: 'contracts', icon: <FileText size={18} />,  label: 'Contracts' },
   ];
   const freelancerLinks = [
     { id: 'dashboard',    icon: <BarChart3 size={18} />,    label: 'Dashboard' },
+    { id: 'messages',     icon: <MessageCircle size={18} />, label: 'Messages' },
     { id: 'find-projects',icon: <Search size={18} />,       label: 'Find Projects' },
     { id: 'proposals',   icon: <Send size={18} />,          label: 'My Proposals' },
     { id: 'contracts',   icon: <FileText size={18} />,      label: 'Contracts' },
@@ -1541,6 +1651,7 @@ export default function App() {
     if (user?.role === 'client') {
       switch (activeTab) {
         case 'dashboard': return <ClientDashboard jobs={myJobs} contracts={contracts} proposals={jobProposals} onHire={handleHire} onComplete={handleComplete} onViewJob={() => {}} triggerAlert={triggerAlert} />;
+        case 'messages':  return <MessagesView contracts={contracts} user={user} triggerAlert={triggerAlert} />;
         case 'post-job':  return <PostJobForm onSuccess={() => { setActiveTab('my-jobs'); fetchDashboardData(); }} triggerAlert={triggerAlert} />;
         case 'my-jobs':   return <MyJobs jobs={myJobs} />;
         case 'contracts': return <ContractsView contracts={contracts} user={user} onComplete={handleComplete} triggerAlert={triggerAlert} />;
@@ -1550,6 +1661,7 @@ export default function App() {
     } else {
       switch (activeTab) {
         case 'dashboard':     return <FreelancerDashboard proposals={proposals} contracts={contracts} setTab={setActiveTab} />;
+        case 'messages':      return <MessagesView contracts={contracts} user={user} triggerAlert={triggerAlert} />;
         case 'find-projects': return <FindProjects triggerAlert={triggerAlert} onProposalSent={fetchDashboardData} />;
         case 'proposals':     return <ProposalsView proposals={proposals} />;
         case 'contracts':     return <ContractsView contracts={contracts} user={user} onComplete={handleComplete} triggerAlert={triggerAlert} />;
