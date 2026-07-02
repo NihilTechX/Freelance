@@ -3,7 +3,8 @@ import {
   Briefcase, Search, Bell, LogOut, Plus, Star, CheckCircle2,
   AlertCircle, TrendingUp, FileText, ChevronRight, User,
   Building, Globe, Clock, Shield, Zap, Award, BarChart3,
-  ArrowRight, Menu, X, Check, Edit3, Send, MessageCircle, CreditCard
+  ArrowRight, Menu, X, Check, Edit3, Send, MessageCircle, CreditCard,
+  Folder, Rocket, Coffee, Code, Atom, Terminal
 } from 'lucide-react';
 import api, { clearAuth, getWsUrl } from './api';
 import './index.css';
@@ -39,7 +40,7 @@ function Toast({ alert }) {
 /* ═══════════════════════════════════════════════════════════
    LANDING PAGE
 ═══════════════════════════════════════════════════════════ */
-function LandingPage({ onHire, onFindWork }) {
+function LandingPage({ onHire, onFindWork, onSignIn }) {
   const featureCards = [
     {
       icon: <Search size={22} />,
@@ -75,6 +76,22 @@ function LandingPage({ onHire, onFindWork }) {
     { value: '98%', label: 'Satisfaction Rate' },
   ];
 
+  const badges = [
+    { icon: Shield, label: 'Verified', angle: 270, rx: '18deg', ry: '0deg' },
+    { icon: Folder, label: 'Portfolio', angle: 306, rx: '14deg', ry: '-14deg' },
+    { icon: Rocket, label: 'New Project', angle: 342, rx: '6deg', ry: '-22deg' },
+    { icon: Award, label: 'Top Rated', angle: 18, rx: '-6deg', ry: '-22deg' },
+    { icon: Terminal, label: 'Python', angle: 54, rx: '-14deg', ry: '-14deg' },
+    { icon: Atom, label: 'React', angle: 90, rx: '-18deg', ry: '0deg' },
+    { icon: Coffee, label: 'Java', angle: 126, rx: '-14deg', ry: '14deg' },
+    { icon: Code, label: 'Developer', angle: 162, rx: '-6deg', ry: '22deg' },
+    { icon: FileText, label: 'Resume', angle: 198, rx: '6deg', ry: '22deg' },
+    { icon: Briefcase, label: 'Briefcase', angle: 234, rx: '14deg', ry: '14deg' },
+  ];
+
+  const radiusX = 225;
+  const radiusY = 185;
+
   return (
     <div className="landing-page">
       <header className="landing-nav">
@@ -93,7 +110,10 @@ function LandingPage({ onHire, onFindWork }) {
           <a href="#resources">Resources</a>
         </nav>
 
-        <button className="landing-cta" onClick={onHire}>Get Started</button>
+        <div className="landing-nav-actions">
+          <button className="landing-nav-signin" onClick={onSignIn}>Sign In</button>
+          <button className="landing-cta" onClick={onHire}>Get Started</button>
+        </div>
       </header>
 
       <main>
@@ -128,42 +148,50 @@ function LandingPage({ onHire, onFindWork }) {
           </div>
 
           <div className="landing-hero-visual" aria-hidden="true">
-            <div className="visual-orbit visual-orbit-one" />
-            <div className="visual-orbit visual-orbit-two" />
-            <div className="glass-card glass-card-back" />
-            <div className="glass-card glass-card-top">
-              <div className="glass-window" />
-            </div>
-            <div className="glass-card profile-card profile-card-main">
-              <div className="profile-ring">
-                <User size={30} />
+            {/* Orbit Paths */}
+            <div className="orbit-ellipse orbit-ellipse-one" />
+            <div className="orbit-ellipse orbit-ellipse-two" />
+
+            {/* Central 3D Orb */}
+            <div className="central-3d-orb-wrap">
+              <div className="central-3d-orb-glow" />
+              <div className="central-3d-orb">
+                <div className="orb-shine" />
+                <div className="orb-inner-content">
+                  <User className="orb-icon" size={44} color="#fff" />
+                  <Star className="orb-star-badge" size={18} color="#fff" fill="#fff" />
+                </div>
               </div>
-              <div className="profile-lines">
-                <span />
-                <span />
-                <span />
-              </div>
-              <div className="mini-badge">&lt;/&gt;</div>
+              <div className="orb-shadow-glow" />
             </div>
-            <div className="glass-card profile-card profile-card-side">
-              <div className="profile-avatar">+</div>
-              <div className="profile-lines compact">
-                <span />
-                <span />
-                <span />
-              </div>
-            </div>
-            <div className="glass-card profile-card profile-card-small">
-              <div className="profile-avatar alt">×</div>
-              <div className="profile-lines compact">
-                <span />
-                <span />
-              </div>
-            </div>
-            <div className="glass-node glass-node-top" />
-            <div className="glass-node glass-node-left" />
-            <div className="glass-node glass-node-bottom" />
-            <div className="glass-node glass-node-right" />
+
+            {/* Floating Badges */}
+            {badges.map((badge, idx) => {
+              const angleRad = (badge.angle * Math.PI) / 180;
+              const x = Math.cos(angleRad) * radiusX;
+              const y = Math.sin(angleRad) * radiusY;
+              const IconComponent = badge.icon;
+              return (
+                <div
+                  key={idx}
+                  className="floating-3d-badge"
+                  style={{
+                    left: `calc(50% + ${x}px)`,
+                    top: `calc(50% + ${y}px)`,
+                    '--rx': badge.rx,
+                    '--ry': badge.ry,
+                    animationDelay: `${idx * -0.6}s`,
+                  }}
+                >
+                  <div className="badge-glass-content">
+                    <div className="badge-glow-icon">
+                      <IconComponent size={28} color="#fff" />
+                    </div>
+                    <span className="badge-label">{badge.label}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
 
@@ -265,28 +293,59 @@ function LandingPage({ onHire, onFindWork }) {
       </div>
 
       <div className="screen-chart">
-        <div />
-        <div />
-        <div />
-        <div />
+        <div className="chart-bar-wrap">
+          <div className="chart-tooltip">$12K</div>
+          <div className="chart-bar" style={{ height: '48px' }} />
+          <span className="chart-label">Dev</span>
+        </div>
+        <div className="chart-bar-wrap">
+          <div className="chart-tooltip">$28K</div>
+          <div className="chart-bar" style={{ height: '112px' }} />
+          <span className="chart-label">Design</span>
+        </div>
+        <div className="chart-bar-wrap">
+          <div className="chart-tooltip">$18K</div>
+          <div className="chart-bar" style={{ height: '74px' }} />
+          <span className="chart-label">Mktg</span>
+        </div>
+        <div className="chart-bar-wrap">
+          <div className="chart-tooltip">$42K</div>
+          <div className="chart-bar" style={{ height: '138px' }} />
+          <span className="chart-label">AI/Data</span>
+        </div>
       </div>
 
       <div className="screen-card-row">
         <div className="screen-chip">
-          <strong>48h</strong>
-          <span>Average match time</span>
+          <div className="chip-icon-wrap">
+            <Clock size={16} color="var(--violet-700)" />
+          </div>
+          <div className="chip-copy">
+            <strong>48h</strong>
+            <span>Avg. Match Time</span>
+          </div>
         </div>
 
         <div className="screen-chip">
-          <strong>4.9/5</strong>
-          <span>Top freelancer rating</span>
+          <div className="chip-icon-wrap">
+            <Star size={16} color="var(--gold)" fill="var(--gold)" />
+          </div>
+          <div className="chip-copy">
+            <strong>4.9/5</strong>
+            <span>Freelancer Rating</span>
+          </div>
         </div>
       </div>
 
       <div className="screen-insight">
-        <div>
-          <strong>1,240</strong>
-          <span>Projects matched this month</span>
+        <div className="insight-header">
+          <div className="insight-icon-wrap">
+            <TrendingUp size={16} color="var(--violet-700)" />
+          </div>
+          <div className="insight-copy">
+            <strong>1,240</strong>
+            <span>Projects matched this month</span>
+          </div>
         </div>
 
         <div className="screen-mini-progress">
@@ -297,6 +356,7 @@ function LandingPage({ onHire, onFindWork }) {
 
   </div>
 </section>
+  </main>
 
       <footer className="landing-footer">
         <div className="footer-top">
@@ -1645,18 +1705,8 @@ export default function App() {
     return (
       <>
         <Toast alert={alert} />
-        <nav className="navbar">
-          <div className="navbar-logo">
-            <div className="navbar-logo-icon"><Briefcase size={20} color="#fff" /></div>
-            <span className="navbar-logo-text">EliteMatch</span>
-          </div>
-          <div className="navbar-spacer" />
-          <div className="navbar-links">
-            <button className="navbar-link" onClick={() => { setAuthConfig({ tab: 'login', role: 'client' }); setPage('auth'); }}>Sign In</button>
-            <button className="btn btn-green btn-sm" onClick={() => { setAuthConfig({ tab: 'register', role: 'client' }); setPage('auth'); }}>Get Started</button>
-          </div>
-        </nav>
         <LandingPage
+          onSignIn={() => { setAuthConfig({ tab: 'login', role: 'client' }); setPage('auth'); }}
           onHire={() => { setAuthConfig({ tab: 'register', role: 'client' }); setPage('auth'); }}
           onFindWork={() => { setAuthConfig({ tab: 'register', role: 'freelancer' }); setPage('auth'); }}
         />
