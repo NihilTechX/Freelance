@@ -593,12 +593,7 @@ img { display: block; max-width: 100%; }
    ============================================================ */
 .landing-page {
   min-height: 100vh;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% -20%, rgba(136,112,225,0.22) 0%, transparent 65%),
-    radial-gradient(ellipse 60% 50% at 85% 20%, rgba(165,139,245,0.15) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 40% at 15% 30%, rgba(106,79,220,0.12) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 60% at 50% 80%, rgba(200,180,255,0.1) 0%, transparent 55%),
-    linear-gradient(180deg, #f9f7ff 0%, #ede6ff 35%, #e0d5ff 70%, #c5b6ff 100%);
+  background: linear-gradient(180deg, #e8def8 0%, #6a4fdc 100%);
   color: #111018;
   overflow-x: hidden;
 }
@@ -889,7 +884,7 @@ img { display: block; max-width: 100%; }
   border-radius: 42px;
   overflow: visible;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
 }
 
