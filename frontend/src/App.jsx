@@ -63,35 +63,35 @@ function LandingPage({ onHire, onFindWork, onSignIn }) {
   const featureCards = [
     {
       icon: <Search size={22} />,
-      title: 'Build Your Portfolio',
-      desc: 'Work on real-world projects that showcase your skills and help you stand out to future employers.',
+      title: 'AI-Powered Matching',
+      desc: 'Our semantic search engine surfaces the best-fit specialized talent based on skills, experience, and project scope.',
       tone: 'violet',
     },
     {
       icon: <Shield size={22} />,
-      title: 'Learn & Grow',
-      desc: 'Connect with mentors, collaborate with peers, and gain experience that actual companies value.',
+      title: 'Secure Collaboration',
+      desc: 'Safeguard your work and payments with built-in milestone management, secure contracts, and escrow protection.',
       tone: 'blue',
     },
     {
       icon: <Zap size={22} />,
-      title: 'Earn While Learning',
-      desc: 'Get paid competitively for your work with flexible hours that fit around your class schedule.',
+      title: 'Seamless Workflows',
+      desc: 'From proposal to final delivery and review, manage your entire contract pipeline in one streamlined platform.',
       tone: 'indigo',
     },
   ];
 
   const processSteps = [
-    { n: '1', title: 'Explore Projects', desc: 'Browse student-friendly opportunities that match your skills and interests.' },
-    { n: '2', title: 'Apply & Match', desc: 'Submit proposals and get matched with projects that fit your expertise.' },
-    { n: '3', title: 'Collaborate', desc: 'Work with peers and mentors in a supportive, guided environment.' },
-    { n: '4', title: 'Get Recognized', desc: 'Build your portfolio, earn rewards, and grow your professional network.' },
+    { n: '1', title: 'Post or Search', desc: 'Clients post specialized projects, and freelancers browse targeted opportunities matching their skills.' },
+    { n: '2', title: 'Smart Match', desc: 'AI calculates matching scores, ranking the best technical freelancers for the job.' },
+    { n: '3', title: 'Secure Contract', desc: 'Review proposals, align on terms, and start working under a secure milestone agreement.' },
+    { n: '4', title: 'Deliver & Get Paid', desc: 'Approve deliverables, release escrow payments, and leave verified ratings.' },
   ];
 
   const statsData = [
-    { value: 500, suffix: '+', label: 'Student Projects' },
-    { value: 200, suffix: '+', label: 'Campus Ambassadors' },
-    { value: 50, suffix: '+', label: 'University Partners' },
+    { value: 10, suffix: 'K+', label: 'Active Freelancers' },
+    { value: 5, suffix: 'K+', label: 'Happy Clients' },
+    { value: 50, suffix: 'K+', label: 'Projects Completed' },
     { value: 48, suffix: 'h', label: 'Avg. Match Time' },
   ];
 
@@ -186,7 +186,7 @@ function LandingPage({ onHire, onFindWork, onSignIn }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
             >
-              The student-first marketplace where talent meets opportunity. Find real projects, build your portfolio, connect with mentors, and earn—all while studying.
+              Specialized talent, secure collaboration, and seamless workflows for high-trust hiring.
             </motion.p>
             <motion.div
               className="landing-actions"
