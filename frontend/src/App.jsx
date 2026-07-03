@@ -6,6 +6,7 @@ import {
   ArrowRight, Menu, X, Check, Edit3, Send, MessageCircle, CreditCard,
   Folder, Rocket, Coffee, Code, Atom, Terminal
 } from 'lucide-react';
+import { motion, useInView } from 'framer-motion';
 import api, { clearAuth, getWsUrl } from './api';
 import './index.css';
 
@@ -38,63 +39,105 @@ function Toast({ alert }) {
 }
 
 /* ═══════════════════════════════════════════════════════════
-   LANDING PAGE
+   LANDING PAGE – Premium Redesign
 ═══════════════════════════════════════════════════════════ */
 function LandingPage({ onHire, onFindWork, onSignIn }) {
+  const [scrolled, setScrolled] = useState(false);
+  const heroRef = useRef(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const handleMouseMove = useCallback((e) => {
+    const rect = heroRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setMousePos({ x, y });
+  }, []);
+
   const featureCards = [
     {
       icon: <Search size={22} />,
-      title: 'AI-Powered Matching',
-      desc: 'We surface the best-fit talent based on skills, experience, and prior work.',
+      title: 'Build Your Portfolio',
+      desc: 'Work on real-world projects that showcase your skills and help you stand out to future employers.',
       tone: 'violet',
     },
     {
       icon: <Shield size={22} />,
-      title: 'Secure Collaboration',
-      desc: 'Built-in safeguards for payments, approvals, and trusted project delivery.',
+      title: 'Learn & Grow',
+      desc: 'Connect with mentors, collaborate with peers, and gain experience that actual companies value.',
       tone: 'blue',
     },
     {
       icon: <Zap size={22} />,
-      title: 'Fast Hiring Flow',
-      desc: 'Post, match, and start working in minutes with a focused hiring workflow.',
+      title: 'Earn While Learning',
+      desc: 'Get paid competitively for your work with flexible hours that fit around your class schedule.',
       tone: 'indigo',
     },
   ];
 
   const processSteps = [
-    { n: '1', title: 'Post a Project', desc: 'Describe the work and specialized requirements.' },
-    { n: '2', title: 'Get Matched', desc: 'Review the best freelancers and technical experts.' },
-    { n: '3', title: 'Collaborate', desc: 'Chat, share files, and track progress together.' },
-    { n: '4', title: 'Complete & Pay', desc: 'Approve the work and release secure payments.' },
+    { n: '1', title: 'Explore Projects', desc: 'Browse student-friendly opportunities that match your skills and interests.' },
+    { n: '2', title: 'Apply & Match', desc: 'Submit proposals and get matched with projects that fit your expertise.' },
+    { n: '3', title: 'Collaborate', desc: 'Work with peers and mentors in a supportive, guided environment.' },
+    { n: '4', title: 'Get Recognized', desc: 'Build your portfolio, earn rewards, and grow your professional network.' },
   ];
 
-  const stats = [
-    { value: '10K+', label: 'Freelancers' },
-    { value: '5K+', label: 'Clients' },
-    { value: '50K+', label: 'Projects Completed' },
-    { value: '98%', label: 'Satisfaction Rate' },
+  const statsData = [
+    { value: 500, suffix: '+', label: 'Student Projects' },
+    { value: 200, suffix: '+', label: 'Campus Ambassadors' },
+    { value: 50, suffix: '+', label: 'University Partners' },
+    { value: 48, suffix: 'h', label: 'Avg. Match Time' },
   ];
 
-  const badges = [
-    { icon: Shield, label: 'Verified', angle: 270, rx: '18deg', ry: '0deg' },
-    { icon: Folder, label: 'Portfolio', angle: 306, rx: '14deg', ry: '-14deg' },
-    { icon: Rocket, label: 'New Project', angle: 342, rx: '6deg', ry: '-22deg' },
-    { icon: Award, label: 'Top Rated', angle: 18, rx: '-6deg', ry: '-22deg' },
-    { icon: Terminal, label: 'Python', angle: 54, rx: '-14deg', ry: '-14deg' },
-    { icon: Atom, label: 'React', angle: 90, rx: '-18deg', ry: '0deg' },
-    { icon: Coffee, label: 'Java', angle: 126, rx: '-14deg', ry: '14deg' },
-    { icon: Code, label: 'Developer', angle: 162, rx: '-6deg', ry: '22deg' },
-    { icon: FileText, label: 'Resume', angle: 198, rx: '6deg', ry: '22deg' },
-    { icon: Briefcase, label: 'Briefcase', angle: 234, rx: '14deg', ry: '14deg' },
+  const floatingCards = [
+    { icon: Shield, label: 'Verified', angle: 270, delay: 0 },
+    { icon: Folder, label: 'Portfolio', angle: 306, delay: 0.3 },
+    { icon: Rocket, label: 'New Project', angle: 342, delay: 0.6 },
+    { icon: Award, label: 'Top Rated', angle: 18, delay: 0.9 },
+    { icon: Terminal, label: 'Python', angle: 54, delay: 1.2 },
+    { icon: Atom, label: 'React', angle: 90, delay: 1.5 },
+    { icon: Coffee, label: 'Java', angle: 126, delay: 1.8 },
+    { icon: Code, label: 'Developer', angle: 162, delay: 2.1 },
+    { icon: FileText, label: 'Resume', angle: 198, delay: 2.4 },
+    { icon: Briefcase, label: 'Briefcase', angle: 234, delay: 2.7 },
   ];
 
-  const radiusX = 225;
-  const radiusY = 185;
+  const ORBIT_RADIUS = 210;
+
+  function CountUp({ end, suffix }) {
+    const ref = useRef(null);
+    const inView = useInView(ref, { once: true, margin: '0px 0px -100px 0px' });
+    const [count, setCount] = useState(0);
+
+    useEffect(() => {
+      if (!inView) return;
+      let start = 0;
+      const duration = 2000;
+      const step = Math.max(1, Math.floor(end / 60));
+      const timer = setInterval(() => {
+        start += step;
+        if (start >= end) { start = end; clearInterval(timer); }
+        setCount(start);
+      }, duration / 60);
+      return () => clearInterval(timer);
+    }, [inView, end]);
+
+    return (
+      <span ref={ref}>
+        {inView ? count.toLocaleString() : '0'}{suffix}
+      </span>
+    );
+  }
 
   return (
     <div className="landing-page">
-      <header className="landing-nav">
+      <header className={`landing-nav ${scrolled ? 'scrolled' : ''}`}>
         <div className="landing-brand">
           <div className="landing-brand-mark">
             <Briefcase size={18} color="#f4efff" />
@@ -117,18 +160,40 @@ function LandingPage({ onHire, onFindWork, onSignIn }) {
       </header>
 
       <main>
-        <section className="landing-hero">
+        <section className="landing-hero" ref={heroRef} onMouseMove={handleMouseMove}>
           <div className="landing-hero-copy">
-            <p className="landing-kicker">EliteMatch connects specialized talent with fast-moving teams</p>
-            <h1 className="landing-title">
+            <motion.p
+              className="landing-kicker"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+            >
+              Built for students. Trusted by startups.
+            </motion.p>
+            <motion.h1
+              className="landing-title"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.1, ease: 'easeOut' }}
+            >
               Find Talent.
               <br />
               Get Work. <span>Grow Together.</span>
-            </h1>
-            <p className="landing-subtitle">
-              EliteMatch connects businesses with top specialized mathematical and technical talent using AI-powered matching for smarter, faster, and hassle-free hiring.
-            </p>
-            <div className="landing-actions">
+            </motion.h1>
+            <motion.p
+              className="landing-subtitle"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
+            >
+              The student-first marketplace where talent meets opportunity. Find real projects, build your portfolio, connect with mentors, and earn—all while studying.
+            </motion.p>
+            <motion.div
+              className="landing-actions"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3, ease: 'easeOut' }}
+            >
               <button className="landing-primary-btn" onClick={onHire}>
                 Hire Top Talent
                 <span className="landing-btn-arrow"><ArrowRight size={18} /></span>
@@ -136,227 +201,320 @@ function LandingPage({ onHire, onFindWork, onSignIn }) {
               <button className="landing-secondary-btn" onClick={onFindWork}>
                 Find Work
               </button>
-            </div>
-            <div className="landing-stats" aria-label="Platform statistics">
-              {stats.map((stat) => (
+            </motion.div>
+            <motion.div
+              className="landing-stats"
+              aria-label="Platform statistics"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4, ease: 'easeOut' }}
+            >
+              {statsData.map((stat) => (
                 <div key={stat.label} className="landing-stat">
-                  <strong>{stat.value}</strong>
+                  <strong><CountUp end={stat.value} suffix={stat.suffix} /></strong>
                   <span>{stat.label}</span>
                 </div>
               ))}
-            </div>
+            </motion.div>
           </div>
 
           <div className="landing-hero-visual" aria-hidden="true">
-            {/* Orbit Paths */}
-            <div className="orbit-ellipse orbit-ellipse-one" />
-            <div className="orbit-ellipse orbit-ellipse-two" />
+            <div className="hero-light-bg" />
+            <div className="hero-grain-overlay" />
 
-            {/* Central 3D Orb */}
-            <div className="central-3d-orb-wrap">
-              <div className="central-3d-orb-glow" />
-              <div className="central-3d-orb">
-                <div className="orb-shine" />
-                <div className="orb-inner-content">
-                  <User className="orb-icon" size={44} color="#fff" />
-                  <Star className="orb-star-badge" size={18} color="#fff" fill="#fff" />
-                </div>
-              </div>
-              <div className="orb-shadow-glow" />
-            </div>
+            <div className="orbit-scene">
+              <div className="orbit-ring" />
+              <div className="orbit-ring inner" />
 
-            {/* Floating Badges */}
-            {badges.map((badge, idx) => {
-              const angleRad = (badge.angle * Math.PI) / 180;
-              const x = Math.cos(angleRad) * radiusX;
-              const y = Math.sin(angleRad) * radiusY;
-              const IconComponent = badge.icon;
-              return (
-                <div
-                  key={idx}
-                  className="floating-3d-badge"
-                  style={{
-                    left: `calc(50% + ${x}px)`,
-                    top: `calc(50% + ${y}px)`,
-                    '--rx': badge.rx,
-                    '--ry': badge.ry,
-                    animationDelay: `${idx * -0.6}s`,
-                  }}
-                >
-                  <div className="badge-glass-content">
-                    <div className="badge-glow-icon">
-                      <IconComponent size={28} color="#fff" />
-                    </div>
-                    <span className="badge-label">{badge.label}</span>
+              <div className="hero-central-ai">
+                <div className="hero-ai-glow" />
+                <div className="hero-ai-core">
+                  <div className="hero-ai-shine" />
+                  <div className="hero-ai-inner">
+                    <User size={40} color="#fff" />
+                    <div className="hero-ai-pulse-ring" />
                   </div>
                 </div>
+                <div className="hero-ai-shadow" />
+              </div>
+
+              {floatingCards.map((card, idx) => {
+              const angleRad = (card.angle * Math.PI) / 180;
+              const cx = Math.cos(angleRad) * ORBIT_RADIUS;
+              const cy = Math.sin(angleRad) * ORBIT_RADIUS;
+              const IconComponent = card.icon;
+              const parallaxX = mousePos.x * 30;
+              const parallaxY = mousePos.y * 30;
+              return (
+                <motion.div
+                  key={idx}
+                  className="floating-card"
+                  style={{
+                    left: `calc(50% + ${cx}px - 50px)`,
+                    top: `calc(50% + ${cy}px - 50px)`,
+                  }}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{
+                    opacity: 1,
+                    scale: 1,
+                    y: [0, -12, 0],
+                    x: [0, 0, 0],
+                  }}
+                  transition={{
+                    opacity: { duration: 0.8, delay: 0.2 + card.delay * 0.1 },
+                    scale: { duration: 0.8, delay: 0.2 + card.delay * 0.1 },
+                    y: {
+                      duration: 4 + idx % 2,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      delay: card.delay * 0.5,
+                    },
+                  }}
+                  whileHover={{ scale: 1.08, transition: { duration: 0.3 } }}
+                >
+                  <div
+                    className="floating-card-glass"
+                    style={{
+                      transform: `translate(${parallaxX * 0.03}px, ${parallaxY * 0.03}px)`,
+                    }}
+                  >
+                    <div className="floating-card-icon">
+                      <IconComponent size={24} color="#fff" />
+                    </div>
+                    <span className="floating-card-label">{card.label}</span>
+                  </div>
+                </motion.div>
               );
             })}
+            </div>
           </div>
         </section>
 
-        <section className="section-shell section-features">
+        <motion.section
+          className="section-shell section-features"
+          initial={{ opacity: 0, y: 60 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+        >
           <div className="section-heading">
             <h2>Why EliteMatch?</h2>
             <p>Specialized talent, secure collaboration, and seamless workflows for high-trust hiring.</p>
           </div>
           <div className="feature-grid">
             {featureCards.map((card) => (
-              <article key={card.title} className={`feature-panel ${card.tone}`}>
-                <div className="feature-icon-wrap">{card.icon}</div>
+              <motion.article
+                key={card.title}
+                className={`feature-panel ${card.tone}`}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.3 } }}
+              >
+                <motion.div
+                  className="feature-icon-wrap"
+                  whileHover={{ rotate: 0, background: 'var(--violet-900)', color: '#fff', transition: { duration: 0.3 } }}
+                >
+                  {card.icon}
+                </motion.div>
                 <h3>{card.title}</h3>
                 <p>{card.desc}</p>
-              </article>
+              </motion.article>
             ))}
           </div>
           <div className="center-action">
-            <button className="landing-secondary-btn dark">Explore More <ArrowRight size={16} /></button>
+            <motion.button
+              className="landing-secondary-btn dark"
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+            >
+              Explore More <ArrowRight size={16} />
+            </motion.button>
           </div>
-        </section>
+        </motion.section>
 
-        <section className="section-shell section-how" id="how-it-works">
+        <motion.section
+          className="section-shell section-how"
+          id="how-it-works"
+          initial={{ opacity: 0, y: 60 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+        >
           <div className="section-heading">
             <h2>How EliteMatch Works</h2>
             <p>A simple process for connecting specialized talent and clients.</p>
           </div>
           <div className="process-grid">
-            {processSteps.map((step) => (
-              <article key={step.n} className="process-step">
+            {processSteps.map((step, i) => (
+              <motion.article
+                key={step.n}
+                className="process-step"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.5, delay: i * 0.1, ease: 'easeOut' }}
+                whileHover={{ y: -6, transition: { duration: 0.2 } }}
+              >
                 <div className="process-step-number">{step.n}</div>
                 <h3>{step.title}</h3>
                 <p>{step.desc}</p>
-              </article>
+              </motion.article>
             ))}
           </div>
 
-          <div className="trust-panel">
+          <motion.div
+            className="trust-panel"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+          >
             <div className="trust-copy">
               <p className="trust-copy-title">Trusted by thousands worldwide</p>
               <p>Join a growing community of clients and freelancers choosing a more focused marketplace.</p>
-              <button className="trust-btn" onClick={onHire}>Join EliteMatch <ArrowRight size={16} /></button>
+              <motion.button className="trust-btn" onClick={onHire} whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+                Join EliteMatch <ArrowRight size={16} />
+              </motion.button>
             </div>
             <div className="trust-metrics">
-              <div>
-                <Building size={22} />
-                <strong>10K+</strong>
-                <span>Active Freelancers</span>
-              </div>
-              <div>
-                <Globe size={22} />
-                <strong>5K+</strong>
-                <span>Happy Clients</span>
-              </div>
-              <div>
-                <Clock size={22} />
-                <strong>50K+</strong>
-                <span>Projects Completed</span>
-              </div>
-              <div>
-                <Star size={22} />
-                <strong>4.9/5</strong>
-                <span>Average Rating</span>
-              </div>
+              {[
+                { icon: Building, value: '10K+', label: 'Active Freelancers' },
+                { icon: Globe, value: '5K+', label: 'Happy Clients' },
+                { icon: Clock, value: '50K+', label: 'Projects Completed' },
+                { icon: Star, value: '4.9/5', label: 'Average Rating' },
+              ].map((m, i) => (
+                <motion.div
+                  key={m.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.08, ease: 'easeOut' }}
+                  whileHover={{ y: -4, boxShadow: 'var(--shadow-sm)', transition: { duration: 0.2 } }}
+                >
+                  <motion.div whileHover={{ scale: 1.15, transition: { duration: 0.2 } }}>
+                    <m.icon size={22} />
+                  </motion.div>
+                  <strong>{m.value}</strong>
+                  <span>{m.label}</span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </motion.section>
+
+        <motion.section
+          className="section-shell section-audience"
+          initial={{ opacity: 0, y: 60 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+        >
+          <div className="audience-copy" id="clients">
+            <h2>For Students & Startups</h2>
+            <p>
+              Whether you're a student looking to gain real-world experience or a startup needing fresh talent, EliteMatch connects you with the right opportunities.
+            </p>
+            <div className="audience-actions">
+              <motion.button
+                className="audience-btn primary"
+                onClick={onHire}
+                whileHover={{ scale: 1.04, boxShadow: '0 12px 28px rgba(106,79,220,0.35)' }}
+                whileTap={{ scale: 0.97 }}
+              >
+                I&rsquo;m a Client <ArrowRight size={16} />
+              </motion.button>
+              <motion.button
+                className="audience-btn"
+                onClick={onFindWork}
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                I&rsquo;m a Freelancer <ArrowRight size={16} />
+              </motion.button>
             </div>
           </div>
-        </section>
-
-        <section className="section-shell section-audience">
-  <div className="audience-copy" id="clients">
-    <h2>For Clients & Freelancers</h2>
-
-    <p>
-      Whether you need skilled professionals or want to showcase your
-      professional skills, EliteMatch is the perfect place to grow and
-      succeed.
-    </p>
-
-    <div className="audience-actions">
-      <button className="audience-btn primary" onClick={onHire}>
-        I’m a Client <ArrowRight size={16} />
-      </button>
-
-      <button className="audience-btn" onClick={onFindWork}>
-        I’m a Freelancer <ArrowRight size={16} />
-      </button>
-    </div>
-  </div>
-
-  {/* Modify this card with some content */}
-  <div className="audience-visual" id="freelancers" aria-hidden="true">
-
-    {/* Make it prettier */}
-    <div className="audience-screen">
-      <div className="screen-topbar">
-        <span />
-        <span />
-        <span />
-      </div>
-
-      <div className="screen-chart">
-        <div className="chart-bar-wrap">
-          <div className="chart-tooltip">$12K</div>
-          <div className="chart-bar" style={{ height: '48px' }} />
-          <span className="chart-label">Dev</span>
-        </div>
-        <div className="chart-bar-wrap">
-          <div className="chart-tooltip">$28K</div>
-          <div className="chart-bar" style={{ height: '112px' }} />
-          <span className="chart-label">Design</span>
-        </div>
-        <div className="chart-bar-wrap">
-          <div className="chart-tooltip">$18K</div>
-          <div className="chart-bar" style={{ height: '74px' }} />
-          <span className="chart-label">Mktg</span>
-        </div>
-        <div className="chart-bar-wrap">
-          <div className="chart-tooltip">$42K</div>
-          <div className="chart-bar" style={{ height: '138px' }} />
-          <span className="chart-label">AI/Data</span>
-        </div>
-      </div>
-
-      <div className="screen-card-row">
-        <div className="screen-chip">
-          <div className="chip-icon-wrap">
-            <Clock size={16} color="var(--violet-700)" />
+          <div className="audience-visual" id="freelancers" aria-hidden="true">
+            <motion.div
+              className="audience-screen"
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.7, ease: 'easeOut' }}
+              whileHover={{ y: -4, boxShadow: '0 28px 60px rgba(35,27,80,0.16)', transition: { duration: 0.3 } }}
+            >
+              <div className="screen-topbar">
+                <span /><span /><span />
+              </div>
+              <div className="screen-chart">
+                {[
+                  { value: 48, label: 'Dev', tooltip: '$12K' },
+                  { value: 112, label: 'Design', tooltip: '$28K' },
+                  { value: 74, label: 'Mktg', tooltip: '$18K' },
+                  { value: 138, label: 'AI/Data', tooltip: '$42K' },
+                ].map((bar, i) => (
+                  <motion.div
+                    key={bar.label}
+                    className="chart-bar-wrap"
+                    initial={{ height: 0 }}
+                    whileInView={{ height: '100%' }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: 0.2 + i * 0.1, ease: 'easeOut' }}
+                  >
+                    <div className="chart-tooltip">{bar.tooltip}</div>
+                    <div className="chart-bar" style={{ height: `${bar.value}px` }} />
+                    <span className="chart-label">{bar.label}</span>
+                  </motion.div>
+                ))}
+              </div>
+              <div className="screen-card-row">
+                <motion.div
+                  className="screen-chip"
+                  whileHover={{ y: -3, boxShadow: '0 10px 22px rgba(109,90,205,0.12)', transition: { duration: 0.2 } }}
+                >
+                  <div className="chip-icon-wrap">
+                    <Clock size={16} color="var(--violet-700)" />
+                  </div>
+                  <div className="chip-copy">
+                    <strong>48h</strong>
+                    <span>Avg. Match Time</span>
+                  </div>
+                </motion.div>
+                <motion.div
+                  className="screen-chip"
+                  whileHover={{ y: -3, boxShadow: '0 10px 22px rgba(109,90,205,0.12)', transition: { duration: 0.2 } }}
+                >
+                  <div className="chip-icon-wrap">
+                    <Star size={16} color="var(--gold)" fill="var(--gold)" />
+                  </div>
+                  <div className="chip-copy">
+                    <strong>4.9/5</strong>
+                    <span>Freelancer Rating</span>
+                  </div>
+                </motion.div>
+              </div>
+              <motion.div
+                className="screen-insight"
+                whileHover={{ y: -3, boxShadow: '0 12px 26px rgba(109,90,205,0.14)', transition: { duration: 0.2 } }}
+              >
+                <div className="insight-header">
+                  <div className="insight-icon-wrap">
+                    <TrendingUp size={16} color="var(--violet-700)" />
+                  </div>
+                  <div className="insight-copy">
+                    <strong>1,240</strong>
+                    <span>Projects matched this month</span>
+                  </div>
+                </div>
+                <div className="screen-mini-progress">
+                  <span style={{ width: "82%" }} />
+                </div>
+              </motion.div>
+            </motion.div>
           </div>
-          <div className="chip-copy">
-            <strong>48h</strong>
-            <span>Avg. Match Time</span>
-          </div>
-        </div>
-
-        <div className="screen-chip">
-          <div className="chip-icon-wrap">
-            <Star size={16} color="var(--gold)" fill="var(--gold)" />
-          </div>
-          <div className="chip-copy">
-            <strong>4.9/5</strong>
-            <span>Freelancer Rating</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="screen-insight">
-        <div className="insight-header">
-          <div className="insight-icon-wrap">
-            <TrendingUp size={16} color="var(--violet-700)" />
-          </div>
-          <div className="insight-copy">
-            <strong>1,240</strong>
-            <span>Projects matched this month</span>
-          </div>
-        </div>
-
-        <div className="screen-mini-progress">
-          <span style={{ width: "82%" }} />
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-  </main>
+        </motion.section>
+      </main>
 
       <footer className="landing-footer">
         <div className="footer-top">
@@ -395,7 +553,7 @@ function LandingPage({ onHire, onFindWork, onSignIn }) {
           </div>
         </div>
         <div className="footer-bottom">
-          <span>© 2025 Elite Match. All rights reserved.</span>
+          <span>&copy; 2025 Elite Match. All rights reserved.</span>
         </div>
       </footer>
     </div>
